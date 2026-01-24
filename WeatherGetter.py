@@ -33,6 +33,7 @@ class WeatherGetter:
         self.condition = ''
         self.lastUpdated = ''
         self.forecasts = []
+        self.notices = []
 
     def get_page(self):
         self.response = self.http.request('GET', self.location)
@@ -68,6 +69,7 @@ class WeatherGetter:
         self.warnings = ''
         self.condition = ''
         self.forecasts = []
+        self.notices = []
 
         for entry in entries:
             category = entry.find("category").get("term")
@@ -79,6 +81,9 @@ class WeatherGetter:
                 continue
             if category == 'Weather Forecasts':
                 self.forecasts.append(entry)
+                continue
+            if category == 'Notice':
+                self.notices.append(entry)
                 continue
 
             print(f"Unknown entry: {category}")
