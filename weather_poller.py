@@ -22,6 +22,7 @@ __version__ = "0.1.0"
 __license__ = "The Unlicense"
 
 import argparse
+import json
 import socket
 import redis
 import urllib.request
@@ -76,8 +77,9 @@ def write_to_redis(controller):
         if controller.compare_date_updated():
             r = redis.Redis(host='localhost', port=6379, db=0)
             r.set(key + '.lastUpdated', controller.wg.get_last_updated())
-            r.set(key + '.warnings', '\n'.join(controller.wg.get_warnings()))
+            r.set(key + '.warnings', json.dumps(controller.wg.get_warnings()))
             r.set(key + '.condition', controller.wg.get_condition())
+            r.set(key + '.forecasts', json.dumps(controller.wg.get_forecasts()))
             controller.update_lastUpdated()
             print("INFO: Redis write")
     else:

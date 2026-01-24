@@ -51,6 +51,27 @@ When satisfied that everything is working as intended, you can permanently insta
 ## Running More Than One Web Poller
 Same as above, but give each poller service a unique description and filename. You will want to adjust the Key argument (-k) to be unique so you don't overwrite each poller's contents in redis.
 
+## Redis Output Format
+
+When running with the `-r` flag, the poller writes to the following Redis keys (where `{key}` is the value passed to `-k`):
+
+| Key | Type | Description |
+|-----|------|-------------|
+| `{key}.lastUpdated` | string | ISO 8601 timestamp of when Environment Canada last updated the feed |
+| `{key}.warnings` | JSON array | List of active weather warnings/watches (e.g., `["YELLOW WARNING - COLD, Moncton", "SPECIAL WEATHER STATEMENT, Moncton"]`) |
+| `{key}.condition` | string | HTML-formatted current conditions including temperature, humidity, wind, etc. |
+| `{key}.forecasts` | JSON array | List of forecast titles for upcoming days (e.g., `["Saturday: Sunny. High minus 15.", "Saturday night: Clear. Low minus 23."]`) |
+
+Example reading from Redis:
+```python
+import redis
+import json
+
+r = redis.Redis(host='localhost', port=6379, db=0)
+warnings = json.loads(r.get('weather.warnings'))
+forecasts = json.loads(r.get('weather.forecasts'))
+```
+
 ## License
 
 Do what you want with this.
