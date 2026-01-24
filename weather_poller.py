@@ -76,7 +76,7 @@ def write_to_redis(controller):
         if controller.compare_date_updated():
             r = redis.Redis(host='localhost', port=6379, db=0)
             r.set(key + '.lastUpdated', controller.wg.get_last_updated())
-            r.set(key + '.warnings', controller.wg.get_warning())
+            r.set(key + '.warnings', '\n'.join(controller.wg.get_warnings()))
             r.set(key + '.condition', controller.wg.get_condition())
             controller.update_lastUpdated()
             print("INFO: Redis write")
@@ -91,8 +91,13 @@ def write_to_console(controller):
     if controller.update():
         if controller.compare_date_updated():
             print(f"Last Updated: {controller.wg.get_last_updated()}")
-            print(f"warnings: {controller.wg.get_warning()}")
-            print(f"condition: {controller.wg.get_condition()}")
+            print(f"Warnings:")
+            for warning in controller.wg.get_warnings():
+                print(f"  - {warning}")
+            print(f"Condition: {controller.wg.get_condition()}")
+            print(f"Forecasts:")
+            for forecast in controller.wg.get_forecasts():
+                print(f"  - {forecast}")
             controller.update_lastUpdated()
     else:
         print("ERROR: Error fetching data, no data to print")

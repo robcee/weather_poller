@@ -29,7 +29,7 @@ class WeatherGetter:
         self.location = self.moncton # TODO generic
         self.weather = ''
         self.lastUpdated = ''
-        self.warnings = ''
+        self.warnings = []
         self.condition = ''
         self.lastUpdated = ''
         self.forecasts = []
@@ -43,8 +43,8 @@ class WeatherGetter:
 
         return False
     
-    def get_warning(self):
-        """Return the text of the current weather warnings, otherwise empty string"""
+    def get_warnings(self):
+        """Return list of current weather warnings"""
 
         return self.warnings
     
@@ -55,7 +55,11 @@ class WeatherGetter:
     
     def get_last_updated(self):
         return self.lastUpdated
-   
+
+    def get_forecasts(self):
+        """Return list of forecast titles"""
+        return [entry.find("title").get_text() for entry in self.forecasts]
+
     def parse_weather(self):
         """private method, used to parse weather page and extract current conditions and alerts"""
 
@@ -66,7 +70,7 @@ class WeatherGetter:
 
         entries = self.weather.find_all("entry")
 
-        self.warnings = ''
+        self.warnings = []
         self.condition = ''
         self.forecasts = []
         self.notices = []
@@ -74,7 +78,7 @@ class WeatherGetter:
         for entry in entries:
             category = entry.find("category").get("term")
             if category == 'Warnings and Watches':
-                self.warnings = entry.find("title").get_text()
+                self.warnings.append(entry.find("title").get_text())
                 continue
             if category == 'Current Conditions':
                 self.condition = entry.find("summary").get_text()
@@ -97,8 +101,13 @@ def main(args):
     if wg.get_page():
         if wg.parse_weather():
             print(f"Last Updated: {wg.get_last_updated()}")
-            print(f"Warnings: {wg.get_warning()}")
+            print(f"Warnings:")
+            for warning in wg.get_warnings():
+                print(f"  - {warning}")
             print(f"Current Conditions: {wg.get_condition()}")
+            print(f"Forecasts:")
+            for forecast in wg.get_forecasts():
+                print(f"  - {forecast}")
         else:
             print("No Weather Data")
 
