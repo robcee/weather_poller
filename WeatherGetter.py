@@ -22,7 +22,7 @@ class WeatherGetter:
     TODO: Refactor this into a generic WeatherGetter class.
     """
 
-    moncton = 'https://weather.gc.ca/rss/city/nb-36_e.xml'
+    moncton = 'https://weather.gc.ca/rss/weather/46.106_-64.777_e.xml'
 
     def __init__(self):
         self.http = PoolManager()
